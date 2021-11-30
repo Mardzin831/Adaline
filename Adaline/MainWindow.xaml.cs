@@ -120,17 +120,17 @@ namespace Adaline
             {
                 Testing(i);
             }
-            Debug.WriteLine(ERROR / 80 + " %");
+            Debug.WriteLine(ERROR / 170 + " %");
         }
         private void Testing(int unit)
         {
             double O;
-            double S;
             int C;
 
             for(int k = 0; k < test_examples.Count(); k++)
             {
-                S = 0;
+                O = 0;
+
                 if (test_labels[k] == unit)
                 {
                     C = 1;
@@ -142,17 +142,17 @@ namespace Adaline
 
                 for (int i = 0; i < image_size + 1; i++)
                 {
-                    S += units[unit][i] * train_examples[k][i];
-                }
-                O = 1 / (1 + Math.Exp(-S));
-                for (int j = 0; j < image_size + 1; j++)
-                {
-                    units[unit][j] += learn_var * (C - S) * train_examples[k][j] * (O * (1 - O));
+                    O += units[unit][i] * train_examples[k][i];
                 }
 
-                if ((k + 1) % 1000 == 0)
+                for (int j = 0; j < image_size + 1; j++)
                 {
-                    ERROR += Math.Pow(S - C, 2);
+                    units[unit][j] += learn_var * (C - O) * train_examples[k][j];
+                }
+
+                if ((k + 1) % 100 == 0)
+                {
+                    ERROR += Math.Pow(O - C, 2);
                 }
             }
         }
@@ -183,14 +183,12 @@ namespace Adaline
             int drawn;
             double O;
             int C;
-            double S;
             int round = 0;
-            
             
             while (round < maxRounds)
             {
                 drawn = randE.Next(train_examples.Count());
-                S = 0;
+                O = 0;
                 
                 if(train_labels[drawn] == unit)
                 {
@@ -203,18 +201,17 @@ namespace Adaline
 
                 for (int i = 0; i < image_size + 1; i++)
                 {                  
-                    S += w[i] * train_examples[drawn][i];                   
+                    O += w[i] * train_examples[drawn][i];                   
                 }
 
-                O = 1 / (1 + Math.Exp(-S));
                 for (int j = 0; j < image_size + 1; j++)
                 {
-                    w[j] += learn_var * (C - S) * train_examples[drawn][j] * (O * (1 - O));
+                    w[j] += learn_var * (C - O) * train_examples[drawn][j];
                 }
 
                 if(round % 10000 == 0)
                 {
-                    ERROR += Math.Pow(S - C, 2);
+                    ERROR += Math.Pow(O - C, 2);
                 }
 
                 round++;
